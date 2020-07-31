@@ -120,7 +120,33 @@
 
 
     <section>
-        <article><p>included</p></article>
+        <article><h1>Introduction</h1>
+<p>The gamecore is a rest endpoint providing game data. With the ClientSDK developers are capable of using the gamecore REST service without the need to make manual http requests</p>
+<h2>Initialization</h2>
+<p><code>new ClientSDK(false, {baseUrl: '/'})</code></p>
+<p>and</p>
+<p><code>clientSDK.init(providerToken, callback)</code></p>
+<p>should be called once, while the game is loading. It does not interact with the DOM and can be called at an early stage.</p>
+<p>The <code>baseUrl</code> parameter can be modified if the games are uploaded to a shared environment. In the default configuration, clientSDK tries to communicate with the gamecore at <code>$HOST/op/</code></p>
+<p>For LPCL (Luckypoint client library) based games <code>providerToken</code> is provided by lpcl.getSessionID(); Please be aware of the additional events required by the lpcl (like <code>lpcl.reportGameReady()</code>) [see https://github.com/luckypointlabs/luckypoint-client-library]</p>
+<h2>Playing</h2>
+<h3>Base Game</h3>
+<p>Basically a the game is initialized with <code>init()</code> and keeps <code>spin()</code>-ning until something special happens.</p>
+<p>Once the user wins, the frontend has to issue a <code>capture()</code> request at the point when the win should be realized. (When reels are done spinning. A win animation is played, ...)</p>
+<p>If a win is not captured, it gets sent automatically with the next <code>spin()</code> request by the ClientSDK.</p>
+<p>If the user quits, or the network is disconnected before the capture request has successfully finished, the last win will be paid out to the user upon next init()</p>
+<h3>Bonus Game</h3>
+<p>The bonus game works like the basegame, but the wins are paid out at the end of the bonus game, not at the end of the spin. (Freespins count as one bonus game and are paid out at the last spin/summary screen)
+The bonus game is active while the parameter <code>end</code> is <code>false</code>, and <code>spinsLeft</code> is above 0.</p>
+<h3>Events (Smashing)</h3>
+<p>Once the user issues a smash, a <code>triggerEvent(64, {smashReel: 0, smashRow: 0})</code> shoud be called.</p>
+<ul>
+<li><code>smashReel</code> contains the 0-indexed position of the reel (left to right)</li>
+<li><code>smashRow</code> contains the 0-indexed position of the row (top to bottom)</li>
+</ul>
+<p>For an example see the GameCore Server-Side Documentation</p>
+<h4>Flow diagram of game modes</h4>
+<p><img src="https://wundermachine777.github.io/clientsdk_docs/gamecore_flow.svg" />gamecore_flow.svg)</p></article>
     </section>
 
 

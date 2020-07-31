@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> ClientSDK.d.ts</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="style.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">ClientSDK Documentation</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest"
+                        >
+                            Gamecore Server-side Documentation
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/luckypointlabs/luckypoint-client-library"
+                        >
+                            Luckypoint Client Library
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Classes</h3><ul><li><a href="ClientOptions.html">ClientOptions</a></li><li><a href="ClientSDK.html">ClientSDK</a></li></ul><h3><a href="global.html">Global</a></h3></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>ClientSDK.d.ts</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @callback dataCallback
+ * @param {Error|null} err Error | null
+ * @param {any} data
+ */
+/**
+ * @typedef {Object} SpinOptions
+ * @property {string} freespinid - FreeSpin ID
+ */
+/**
+  * Client library for gamecore
+ */
+export declare class ClientSDK {
+    /**
+     * relative path of the backend1
+     * @ignore
+     */
+    baseUrl: string;
+    /**
+     * the activeGUID changes each spin, this is the currently active GUID
+     * @ignore
+     */
+    activeGUID: string;
+    /**
+     *
+     * true, if demomode is enabled
+     * @ignore
+     */
+    demoMode: boolean;
+    /**
+     * Options to set for simulation mode
+     * @ignore
+     */
+    options: ClientOptions;
+    /**
+     * Contains additional aggregator data
+     * @ignore
+     */
+    queryOptions: any;
+    /**
+     * If a win is pending, this contains information to capture the win
+     * @ignore
+     */
+    bookkeeper_data: any;
+    /**
+     * Create a new instance of ClientSDK
+     * @param {boolean} [demo=false] Demo Mode Enabled/Disabled (deprecated) - always false
+     * @param {Object} [options] ClientOptions
+     */
+    constructor(demo?: boolean, options?: ClientOptions);
+    /**
+     * Fire the HTTP request to the server
+     * @param {string} url the url to call
+     * @param {Object} parameters parameters to send via POST
+     * @param {function} callback callback in format (err: string, response: object)
+     */
+    private request;
+    /**
+     * combine parameters into query string
+     * @param object parameters to migrate into query string
+     */
+    private combineParameters;
+    /**
+     * Parse variables sent via GET query string into associative array
+     */
+    private getQueryStringVariables;
+    /**
+     * Initialize a new gaming session
+     * @param {string} providerToken SessionID / TicketID / ProviderToken sent by Operator
+     * @param {function} callback Callback with (err: string, data: object)
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#14309b08-3593-4b71-9e87-8ef5033a175b Example Responses
+     */
+    init(providerToken: string, callback: (err: string, data: object) => void): void;
+    /**
+     * Issue a spin to the game backend, see gamecore server-side documentation for result examples
+     *
+     *
+     * @param {number} bet amount in BET PER LINE (if total bet is 10 and slot has 10 lines, send 1 here)
+     * @param {dataCallback} callback Callback with server response
+     * @param {SpinOptions} options something something
+     * @param {string} [options.clmemberid=""] The Competation Labs ID received from lpcl.getCLMember()
+     * @param {string} [options.freespinid=""] PFR ID from lpcl.getFreeSpinID()
+     * @param {string} [options.cheat=""] Server-Side Cheat Code
+     * @see https://github.com/luckypointlabs/luckypoint-client-library Lucky Point Client Library
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#ea85a558-b31e-4f52-a715-69049543b8b7 GameCore Server-side Documentation
+     */
+    spin(bet: number, callback: (err: string, data: object) => void, options?: {}): void;
+    /**
+     * Capture a previous win from bookkeeper - needs active bookkeeper_data (set automagically)
+     *
+     * Should be called the moment the win should be paid out to the user (after spin, animations)
+     * @param {function} callback Callback with (err: string, data: object)
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#116ddaa0-e1ca-44f6-800b-7340c221a8cb Capture Example Response
+     */
+    capture(callback: (err: string, data: any) => void): void;
+    /**
+     * Trigger a new event on game backend, e.g. smashes
+     *
+     * @param {number} eventNum number event number as specified in the game config (smash is 64)
+     * @param {Object} eventParameters objects the event parameters
+     * @param {number} eventParameters.smashReel [SMASH] 0-indexed reel to smash (0 is left)
+     * @param {number} eventParameters.smashRow [SMASH] 0-indexed row to smash (0 is top)
+     * @param {Function} callback Callback with (err: string, data: object)
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#2ddb5758-341b-4a3c-a00f-feaddf31c447 Smash Example Response
+     */
+    triggerEvent(eventNum: number, eventParameters: object, callback: (err: string, data: object) => void): void;
+    /**
+     * Request the spin history from server
+     * Response format is an array, which contains spin data as received by /spin
+     *
+     * @param {number} [from=new Date()] Date where to start the history (timestamp in ms format (Date.getTime()))
+     * @param {number} [skip=0] skip &lt;skip> entries for paging
+     * @param {number} [number=10] limit results to &lt;number> history entries
+     * @param {Function} callback Callback with (err: string, data: object)
+     */
+    history(from: Date, skip: number, limit: number, callback: (err: string, data: object) => void): void;
+}
+/**
+ * ClientOptions
+ */
+export declare class ClientOptions {
+    /**
+     * client-side cheat injection (deprecated)
+     * @deprecated
+     */
+    injectedJSON?: Array&lt;string>;
+    /**
+     * @deprecated
+     * enables client-side cheats (deprecated)
+     */
+    simulationMode: boolean;
+    /**
+     * prefix to the request url
+     */
+    baseUrl: string;
+}
+//# sourceMappingURL=ClientSDK.d.ts.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>
