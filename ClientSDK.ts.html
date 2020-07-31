@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> ClientSDK.ts</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="style.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">ClientSDK Documentation</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest"
+                        >
+                            Gamecore Server-side Documentation
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/luckypointlabs/luckypoint-client-library"
+                        >
+                            Luckypoint Client Library
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Classes</h3><ul><li><a href="ClientOptions.html">ClientOptions</a></li><li><a href="ClientSDK.html">ClientSDK</a></li></ul><h3><a href="global.html">Global</a></h3></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>ClientSDK.ts</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @callback dataCallback
+ * @param {Error|null} err Error | null
+ * @param {any} data
+ */
+
+ /**
+  * @typedef {Object} SpinOptions
+  * @property {string} freespinid - FreeSpin ID
+  */
+
+/**
+  * Client library for gamecore
+ */
+export class ClientSDK {
+
+    /**
+     * relative path of the backend1
+     * @ignore
+     */
+    baseUrl: string = "/op/";
+
+    /**
+     * the activeGUID changes each spin, this is the currently active GUID
+     * @ignore
+     */
+    activeGUID: string = "";
+
+    /**
+     * 
+     * true, if demomode is enabled
+     * @ignore
+     */
+    demoMode: boolean = false;
+
+    /**
+     * Options to set for simulation mode
+     * @ignore
+     */
+    options: ClientOptions = new ClientOptions();
+
+    /**
+     * Contains additional aggregator data
+     * @ignore
+     */
+    queryOptions: any = {};
+
+    /**
+     * If a win is pending, this contains information to capture the win 
+     * @ignore
+     */
+    bookkeeper_data: any = {};
+
+    /**
+     * Create a new instance of ClientSDK 
+     * @param {boolean} [demo=false] Demo Mode Enabled/Disabled (deprecated) - always false
+     * @param {Object} [options] ClientOptions
+     */
+    constructor(demo: boolean = false, options?: ClientOptions) {
+        this.demoMode = demo;
+        if (process.env.NODE_ENV === 'development') {
+            if (options) {
+                this.options = options;
+            }     
+        }
+        if(options &amp;&amp; options.baseUrl) {
+            this.baseUrl = options.baseUrl + "op/";
+        }
+        this.queryOptions = this.getQueryStringVariables();
+        //this.baseUrl = top.location.protocol + "//" + top.location.host + "/op/";
+    }
+
+    /**
+     * Fire the HTTP request to the server
+     * @param {string} url the url to call
+     * @param {Object} parameters parameters to send via POST
+     * @param {function} callback callback in format (err: string, response: object)
+     */
+    private request(url : string, parameters : object, callback : (err: string, response: object) => void): void {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        
+        if(callback == null) {
+            callback = () => {}
+        }
+
+        xhr.onload = () => {
+            if (xhr.status == 200) {
+                const j = JSON.parse(xhr.responseText);
+                if (!j) {
+                    callback("Error parsing JSON", {});
+                    return;
+                }
+                if(j.pdata &amp;&amp; j.pdata.bkt) {
+                    this.bookkeeper_data.guid = this.activeGUID;
+                    this.bookkeeper_data.ticket_id = j.pdata.bkt;
+                }
+                if (j.g) {
+                    this.activeGUID = j.g;
+                }
+                
+                callback("", j);
+                return;
+            }
+            callback("Error in request: " + url, {});
+        }
+        xhr.ontimeout = (ev: ProgressEvent) => {
+            callback("TIMEOUT", {err: "timeout"});
+        }
+        xhr.onerror = (ev: ProgressEvent) => {
+            callback("ERROR", { err: xhr.statusText });
+        }
+
+        xhr.send(this.combineParameters(parameters));
+    }
+
+    /**
+     * combine parameters into query string 
+     * @param object parameters to migrate into query string
+     */
+    private combineParameters(object: any) {
+        var encodedString = '';
+        for (var prop in object) {
+            if (object.hasOwnProperty(prop)) {
+                if (encodedString.length > 0) {
+                    encodedString += '&amp;';
+                }
+                encodedString += encodeURI(prop + '=' + object[prop]);
+            }
+        }
+        return encodedString;
+    }
+    
+    /**
+     * Parse variables sent via GET query string into associative array
+     */
+    private getQueryStringVariables() {
+        let p : {[index:string] : string} = {};
+        const query = location.search.substring(1);
+        const vars = query.split('&amp;');
+        for (var i = 0; i &lt; vars.length; i++) {
+            var pair = vars[i].split('=');
+            p[pair[0]] = decodeURIComponent(pair[1]);
+        }
+        return p;
+    };
+
+    /**
+     * Initialize a new gaming session
+     * @param {string} providerToken SessionID / TicketID / ProviderToken sent by Operator
+     * @param {function} callback Callback with (err: string, data: object)
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#14309b08-3593-4b71-9e87-8ef5033a175b Example Responses
+     */
+    public init(providerToken: string, callback: (err: string, data: object) => void) {
+        if (process.env.NODE_ENV === 'development' &amp;&amp; this.options.simulationMode) {
+            this.activeGUID = "12345";
+            console.log("INIT Called");
+            callback("", JSON.parse('{"username":"Demo","locale":"de_DE","wallet":50000,"multiplier":1,"bets":[4,8,16,32,100],"userid":"cf7b684d-76b7-45cb-8d4f-93ab62e28caa","g":"bf96d340-7c88-11e9-be51-9537e50a4a54"}'));
+            return;
+        }
+        this.request(this.baseUrl + "init", { providerToken: providerToken, demo: this.demoMode, query: JSON.stringify(this.queryOptions) }, callback);
+    }
+
+
+
+    /**
+     * Issue a spin to the game backend, see gamecore server-side documentation for result examples
+     * 
+     * 
+     * @param {number} bet amount in BET PER LINE (if total bet is 10 and slot has 10 lines, send 1 here)
+     * @param {dataCallback} callback Callback with server response
+     * @param {SpinOptions} options something something
+     * @param {string} [options.clmemberid=""] The Competation Labs ID received from lpcl.getCLMember() 
+     * @param {string} [options.freespinid=""] PFR ID from lpcl.getFreeSpinID()
+     * @param {string} [options.cheat=""] Server-Side Cheat Code
+     * @see https://github.com/luckypointlabs/luckypoint-client-library Lucky Point Client Library
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#ea85a558-b31e-4f52-a715-69049543b8b7 GameCore Server-side Documentation
+     */
+    public spin(bet: number, callback: (err: string, data: object) => void, options = {}) {
+        if (!this.activeGUID) {
+            console.error("Call init() first. Need an active GUID");
+            return;
+        }
+
+        // # Removed from webpack automagically upon prod build
+        if (process.env.NODE_ENV === 'development' &amp;&amp; this.options.simulationMode) {
+            if (this.options.injectedJSON != null &amp;&amp; this.options.injectedJSON.length > 0) {
+                const elem: (string | undefined) = this.options.injectedJSON.shift();
+                if (elem != null) {
+                    if ((window as any).app) {
+                        if (this.options.injectedJSON.length == 0) {
+                            (window as any).app.game._model.slotUi.model.canSpin = false;
+                        }
+                    }
+                    const j = JSON.parse(elem);
+                    if(j != null) {
+                        if(j.g) {
+                            this.activeGUID = j.g;
+                        }
+                    }
+                    callback("", j);
+                    return;
+                }
+            }
+
+            
+        }
+        
+        let params : any = { bet: bet, query: JSON.stringify(this.queryOptions), ...options };
+        if(this.bookkeeper_data &amp;&amp; this.bookkeeper_data.ticket_id) {
+            params['bkt'] = JSON.stringify(this.bookkeeper_data);
+            this.bookkeeper_data = {};
+        }
+
+        this.request(this.baseUrl + "spin/" + this.activeGUID, params, callback);
+    }
+
+    
+    /**
+     * Capture a previous win from bookkeeper - needs active bookkeeper_data (set automagically)
+     * 
+     * Should be called the moment the win should be paid out to the user (after spin, animations)
+     * @param {function} callback Callback with (err: string, data: object)
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#116ddaa0-e1ca-44f6-800b-7340c221a8cb Capture Example Response
+     */
+    public capture(callback: (err: string, data: any) => void) {
+        if(!this.activeGUID) {
+            console.error("Call init() first. Need an active GUID");
+            callback('uninitialized', null);
+            return;
+        }
+        if(!this.bookkeeper_data) {
+            callback('no bkt', null);
+            return;
+        }
+        if(!this.bookkeeper_data.guid) {
+            callback('no guid', null);
+            return;
+        }
+        if(!this.bookkeeper_data.ticket_id) {
+            callback('no ticket id', null);
+            return;
+        }
+
+        this.request(this.baseUrl + "capture/" + this.bookkeeper_data.ticket_id, {guid: this.bookkeeper_data.guid}, callback);
+        this.bookkeeper_data = {};
+    }
+
+    
+    /**
+     * Trigger a new event on game backend, e.g. smashes
+     *
+     * @param {number} eventNum number event number as specified in the game config (smash is 64)
+     * @param {Object} eventParameters objects the event parameters 
+     * @param {number} eventParameters.smashReel [SMASH] 0-indexed reel to smash (0 is left)
+     * @param {number} eventParameters.smashRow [SMASH] 0-indexed row to smash (0 is top)
+     * @param {Function} callback Callback with (err: string, data: object)
+     * @see https://documenter.getpostman.com/view/12205137/T1Dtcujv?version=latest#2ddb5758-341b-4a3c-a00f-feaddf31c447 Smash Example Response
+     */
+    public triggerEvent(eventNum: number, eventParameters: object, callback: (err: string, data: object) => void) {
+        if(isNaN(eventNum)) {
+            console.warn("eventNum is not a number.");
+               return;
+        }
+        
+        this.request(this.baseUrl + "event/" + this.activeGUID + "/" + eventNum, eventParameters, callback);
+    }
+
+
+    /**
+     * Request the spin history from server
+     * Response format is an array, which contains spin data as received by /spin
+     * 
+     * @param {number} [from=new Date()] Date where to start the history (timestamp in ms format (Date.getTime()))
+     * @param {number} [skip=0] skip &lt;skip> entries for paging
+     * @param {number} [number=10] limit results to &lt;number> history entries
+     * @param {Function} callback Callback with (err: string, data: object)
+     */
+    public history(from: Date = new Date(), skip: number = 0, limit: number = 10, callback: (err: string, data: object) => void) {
+        if(isNaN(skip)) {
+            console.warn("parameter skip should be a number");
+            return;
+        }
+        if(skip &lt; 0) {
+            console.warn("skip cannot be below 0");
+            return;
+        }
+        if(isNaN(limit)){
+            console.warn("parameter limit should be a number");
+            return;
+        }
+        if(limit &lt; 0) {
+            console.warn("limit cannot be below zero");
+            return;
+        }
+        const eventParameters = {from : from.getTime(), skip, limit};
+
+        this.request(this.baseUrl + "history/" + this.activeGUID, eventParameters, callback);
+    }
+   
+}
+/**
+ * ClientOptions
+ */
+export class ClientOptions {
+    /**
+     * client-side cheat injection (deprecated)
+     * @deprecated
+     */
+    injectedJSON?: Array&lt;string> = [];
+
+    /**
+     * @deprecated
+     * enables client-side cheats (deprecated)
+     */
+    simulationMode: boolean = false;
+
+    /** 
+     * prefix to the request url 
+     */
+    baseUrl: string = "";
+}
+(window as any).ClientSDK = ClientSDK;</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>
